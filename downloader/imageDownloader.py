@@ -15,7 +15,7 @@ class ImageDownloader:
 
     @staticmethod
     def download_image_from_url(
-            img_url: str, save_path: str | os.PathLike, override: bool = True
+        img_url: str, save_path: str | os.PathLike, override: bool = True
     ):
         img = ImageDownloader._download_image(img_url)
         if img:
@@ -31,7 +31,7 @@ class ImageDownloader:
 
     @staticmethod
     def download_image_from_file(
-            filename: str | os.PathLike, save_path: str | os.PathLike, override: bool = True
+        filename: str | os.PathLike, save_path: str | os.PathLike, override: bool = True
     ):
         if not os.path.isfile(get_path(filename)):
             LOGGER.error("File does not exist")
