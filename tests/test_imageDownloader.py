@@ -50,30 +50,27 @@ def test_download_from_url_successful(fake_dir, working_url):
 
 
 def test_download_from_url_missing_schema(fake_dir):
+    img_url = "www.interactives.natgeofe.com/high-touch/ngm-23-YIP/builds/main/img/photos/MM9747_221026_13114.jpg"
     with patch("logging.Logger.error") as mock_logger:
-        ImageDownloader.download_image_from_url(
-            "www.interactives.natgeofe.com/high-touch/ngm-23-YIP/builds/main/img/photos/MM9747_221026_13114.jpg",
-            fake_dir,
-        )
+        ImageDownloader.download_image_from_url(img_url, fake_dir, )
         mock_logger.assert_called_once()
         mock_logger.assert_called_with(
-            "The following Exception happened: MissingSchema for Url www.interactives.natgeofe.com/high-touch/ngm-23-YIP/builds/main/img/photos/MM9747_221026_13114.jpg\n"
-            "Please check URLs"
+            f'The following Exception happened: MissingSchema for Url {img_url}\n'
+            f'Please check URLs'
         )
         assert fake_dir.exists()
         assert len([*fake_dir.iterdir()]) == 0
 
 
 def test_download_from_url_not_successful(fake_dir):
+    img_url = "https://interactives.natgeofe.com/thisdoesnotexist.jpg"
     with patch("logging.Logger.error") as mock_logger:
-        ImageDownloader.download_image_from_url(
-            "https://interactives.natgeofe.com/thisdoesnotexist.jpg", fake_dir
-        )
+        ImageDownloader.download_image_from_url(img_url, fake_dir)
 
         mock_logger.assert_called_once()
         mock_logger.assert_called_with(
-            "The following Exception happened: HTTPError for Url https://interactives.natgeofe.com/thisdoesnotexist.jpg\n"
-            "Please check URLs"
+            f'The following Exception happened: HTTPError for Url {img_url}\n'
+            f'Please check URLs'
         )
         assert fake_dir.exists()
         assert len([*fake_dir.iterdir()]) == 0
