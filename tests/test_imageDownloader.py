@@ -5,7 +5,8 @@ from unittest.mock import patch
 
 
 def get_path(filename: str) -> Path:
-    return Path(__file__).parent / filename
+    file_path = Path(filename)
+    return file_path.absolute()
 
 
 @pytest.fixture

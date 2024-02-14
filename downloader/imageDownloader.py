@@ -1,20 +1,21 @@
 import requests
 import logging
 import os
+import sys
 from typing import List
 
 LOGGER = logging.getLogger(__name__)
 
 
 def get_path(path: str | os.PathLike):
-    return os.path.join(os.path.dirname(__file__), path)
+    return os.path.abspath(path)
 
 
 class ImageDownloader:
 
     @staticmethod
     def download_image_from_url(
-        img_url: str, save_path: str | os.PathLike, override: bool = True
+            img_url: str, save_path: str | os.PathLike, override: bool = True
     ):
         img = ImageDownloader._download_image(img_url)
         if img:
@@ -30,13 +31,13 @@ class ImageDownloader:
 
     @staticmethod
     def download_image_from_file(
-        filename: str | os.PathLike, save_path: str | os.PathLike, override: bool = True
+            filename: str | os.PathLike, save_path: str | os.PathLike, override: bool = True
     ):
         if not os.path.isfile(get_path(filename)):
             LOGGER.error("File does not exist")
             raise FileNotFoundError
 
-        if not os.path.isdir(save_path):
+        if not os.path.isdir(get_path(save_path)):
             LOGGER.error("Path does not exist")
             raise FileNotFoundError
 
@@ -63,3 +64,9 @@ class ImageDownloader:
         with open(get_path(filename), mode="r") as f:
             urls = [img_url.strip("\n") for img_url in f if img_url]
         return urls
+
+
+if __name__ == "__main__":
+    file = sys.argv[1]
+    dest = sys.argv[2]
+    ImageDownloader.download_image_from_file(file, dest)
