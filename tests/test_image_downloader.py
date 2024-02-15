@@ -109,7 +109,7 @@ def test_download_from_file_not_existing_file(fake_dir, not_existing_file):
             image_downloader.download_image_from_file(not_existing_file, fake_dir)
 
     mock_logger.assert_called_once()
-    mock_logger.assert_called_with("File does not exist")
+    mock_logger.assert_called_with(f"{not_existing_file} does not exist")
     assert fake_dir.exists()
 
 
@@ -121,4 +121,4 @@ def test_download_from_file_not_existing_save_path(get_not_existing_dir, existin
             )
 
     mock_logger.assert_called_once()
-    mock_logger.assert_called_with("Path does not exist")
+    mock_logger.assert_called_with(f"{get_not_existing_dir} does not exist")

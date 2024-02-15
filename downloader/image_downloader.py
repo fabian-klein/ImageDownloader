@@ -1,3 +1,4 @@
+import argparse
 import requests
 import logging
 import os
@@ -18,7 +19,7 @@ def download_image_from_url(
     img = _download_image(img_url)
     if img:
         img_name = img_url.split("/")[-1]
-        save_path = save_path / img_name
+        save_path = save_path + "/" + img_name
         if os.path.isfile(save_path) and not override:
             LOGGER.warning(f"Image not saved! File {save_path}  already exists!")
         else:
@@ -29,16 +30,24 @@ def download_image_from_url(
 def download_image_from_file(
         filename: str | os.PathLike, save_path: str | os.PathLike, override: bool = True
 ):
-    if not os.path.isfile(get_path(filename)):
-        LOGGER.error(f"{filename} does not exist")
-        raise FileNotFoundError(f'Path {filename} does not exist')
+    # if not os.path.isfile(get_path(filename)):
+    if not os.path.isfile(filename):
+        error_msg = f"{filename} does not exist"
+        LOGGER.error(error_msg)
+        raise FileNotFoundError(error_msg)
 
-    if not os.path.isdir(get_path(save_path)):
-        LOGGER.error(f"{save_path} does not exist")
-        raise FileNotFoundError(f"{save_path} does not exist")
+    # if not os.path.isdir(get_path(save_path)):
+    if not os.path.isdir(save_path):
+        error_msg = f"{save_path} does not exist"
+        LOGGER.error(error_msg)
+        raise FileNotFoundError(error_msg)
 
-    save_path = get_path(save_path)
-    img_urls = _get_urls_from_file(get_path(filename))
+    #    save_path = get_path(save_path)
+    save_path = save_path
+
+    # img_urls = _get_urls_from_file(get_path(filename))
+    img_urls = _get_urls_from_file(filename)
+
     for img_url in img_urls:
         if img_url:
             download_image_from_url(img_url, save_path, override)
@@ -57,12 +66,21 @@ def _download_image(img_url: str) -> bytes | None:
 
 
 def _get_urls_from_file(filename: str | os.PathLike) -> List[str]:
-    with open(get_path(filename), mode="r") as f:
+    # with open(get_path(filename), mode="r") as f:
+    with open(filename, mode="r") as f:
         urls = [img_url.strip("\n") for img_url in f if img_url]
     return urls
 
 
 if __name__ == "__main__":
-    file = sys.argv[1]
-    dest = sys.argv[2]
-    download_image_from_file(file, dest)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input-file", dest='file_name')
+    parser.add_argument("-o", "--output-folder", dest='output_folder')
+    args = parser.parse_args()
+
+    input_file = args.file_name
+    output_folder = args.output_folder
+
+    print(input_file)
+    print(output_folder)
+    download_image_from_file(input_file, output_folder)
