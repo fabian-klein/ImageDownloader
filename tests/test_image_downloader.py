@@ -1,6 +1,6 @@
 import pytest
 from pathlib import Path
-from downloader import imageDownloader
+from downloader import image_downloader
 from unittest.mock import patch
 
 
