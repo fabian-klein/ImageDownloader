@@ -20,9 +20,7 @@ def download_image_from_url(
         img_name = img_url.split("/")[-1]
         save_path = save_path / img_name
         if os.path.isfile(save_path) and not override:
-            LOGGER.warning(
-                "Image not saved! File " + str(save_path) + " already exists!"
-            )
+            LOGGER.warning(f"Image not saved! File {save_path}  already exists!")
         else:
             with open(save_path, mode="wb") as img_f:
                 img_f.write(img)
@@ -32,12 +30,12 @@ def download_image_from_file(
         filename: str | os.PathLike, save_path: str | os.PathLike, override: bool = True
 ):
     if not os.path.isfile(get_path(filename)):
-        LOGGER.error("File does not exist")
-        raise FileNotFoundError
+        LOGGER.error(f"{filename} does not exist")
+        raise FileNotFoundError(f'Path {filename} does not exist')
 
     if not os.path.isdir(get_path(save_path)):
-        LOGGER.error("Path does not exist")
-        raise FileNotFoundError
+        LOGGER.error(f"{save_path} does not exist")
+        raise FileNotFoundError(f"{save_path} does not exist")
 
     save_path = get_path(save_path)
     img_urls = _get_urls_from_file(get_path(filename))
