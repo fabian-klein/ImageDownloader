@@ -11,8 +11,6 @@ LOGGER = logging.getLogger(__name__)
 def get_path(filename: str) -> Path:
     return Path(__file__).resolve().parent / filename
 
-    # class ImageDownloader:
-
 
 def download_image_from_url(
         img_url: str, save_path: str | Path, override: bool = True
