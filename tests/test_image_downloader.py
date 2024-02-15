@@ -42,7 +42,7 @@ def get_valid_url():
 
 def test_download_from_url_successful(fake_dir, working_url):
     with patch("logging.Logger.error") as mock_logger:
-        imageDownloader.download_image_from_url(working_url, fake_dir)
+        image_downloader.download_image_from_url(working_url, fake_dir)
         mock_logger.assert_not_called()
         assert fake_dir.exists()
         assert len([*fake_dir.iterdir()]) == 1
@@ -51,7 +51,7 @@ def test_download_from_url_successful(fake_dir, working_url):
 def test_download_from_url_missing_schema(fake_dir):
     img_url = "www.interactives.natgeofe.com/high-touch/ngm-23-YIP/builds/main/img/photos/MM9747_221026_13114.jpg"
     with patch("logging.Logger.error") as mock_logger:
-        imageDownloader.download_image_from_url(
+        image_downloader.download_image_from_url(
             img_url,
             fake_dir,
         )
@@ -67,7 +67,7 @@ def test_download_from_url_missing_schema(fake_dir):
 def test_download_from_url_not_successful(fake_dir):
     img_url = "https://interactives.natgeofe.com/thisdoesnotexist.jpg"
     with patch("logging.Logger.error") as mock_logger:
-        imageDownloader.download_image_from_url(img_url, fake_dir)
+        image_downloader.download_image_from_url(img_url, fake_dir)
 
         mock_logger.assert_called_once()
         mock_logger.assert_called_with(
@@ -79,14 +79,14 @@ def test_download_from_url_not_successful(fake_dir):
 
 
 def test_download_from_file_successful(fake_dir, existing_file):
-    imageDownloader.download_image_from_file(existing_file, fake_dir)
+    image_downloader.download_image_from_file(existing_file, fake_dir)
     assert fake_dir.exists()
     assert len([*fake_dir.iterdir()]) == 5
 
 
 def test_download_from_file_partly_successful(fake_dir, mixed_urls):
     with patch("logging.Logger.error") as mock_logger:
-        imageDownloader.download_image_from_file(mixed_urls, fake_dir)
+        image_downloader.download_image_from_file(mixed_urls, fake_dir)
 
         mock_logger.assert_called()
         logger_calls = mock_logger.call_args_list
@@ -106,7 +106,7 @@ def test_download_from_file_partly_successful(fake_dir, mixed_urls):
 def test_download_from_file_not_existing_file(fake_dir, not_existing_file):
     with patch("logging.Logger.error") as mock_logger:
         with pytest.raises(FileNotFoundError):
-            imageDownloader.download_image_from_file(not_existing_file, fake_dir)
+            image_downloader.download_image_from_file(not_existing_file, fake_dir)
 
     mock_logger.assert_called_once()
     mock_logger.assert_called_with("File does not exist")
@@ -116,7 +116,7 @@ def test_download_from_file_not_existing_file(fake_dir, not_existing_file):
 def test_download_from_file_not_existing_save_path(get_not_existing_dir, existing_file):
     with patch("logging.Logger.error") as mock_logger:
         with pytest.raises(FileNotFoundError):
-            imageDownloader.download_image_from_file(
+            image_downloader.download_image_from_file(
                 existing_file, get_not_existing_dir
             )
 
