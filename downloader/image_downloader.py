@@ -19,7 +19,7 @@ def download_image_from_url(
     img = _download_image(img_url)
     if img:
         img_name = img_url.split("/")[-1]
-        save_path = save_path + "/" + img_name
+        save_path = save_path / img_name
         if os.path.isfile(save_path) and not override:
             LOGGER.warning(f"Image not saved! File {save_path}  already exists!")
         else:
@@ -49,8 +49,7 @@ def download_image_from_file(
     img_urls = _get_urls_from_file(filename)
 
     for img_url in img_urls:
-        if img_url:
-            download_image_from_url(img_url, save_path, override)
+        download_image_from_url(img_url, save_path, override)
 
 
 def _download_image(img_url: str) -> bytes | None:
@@ -68,7 +67,7 @@ def _download_image(img_url: str) -> bytes | None:
 def _get_urls_from_file(filename: str | os.PathLike) -> List[str]:
     # with open(get_path(filename), mode="r") as f:
     with open(filename, mode="r") as f:
-        urls = [img_url.strip("\n") for img_url in f if img_url]
+        urls = [img_url.rstrip() for img_url in f if img_url.rstrip()]
     return urls
 
 
