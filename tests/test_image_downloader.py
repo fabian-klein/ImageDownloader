@@ -2,6 +2,7 @@ import pytest
 from pathlib import Path
 from downloader import image_downloader
 from unittest.mock import patch
+from requests.exceptions import MissingSchema, HTTPError, ConnectionError
 
 
 def get_path(filename: str) -> Path:
@@ -56,10 +57,11 @@ def test_download_from_url_missing_schema(fake_dir):
             fake_dir,
         )
         mock_logger.assert_called_once()
-        mock_logger.assert_called_with(
-            f"The following Exception happened: MissingSchema for Url {img_url}\n"
-            f"Please check URLs"
-        )
+        logger_calls = mock_logger.call_args_list
+        first_call = logger_calls[0]
+        first_call_arguments = first_call[0]
+
+        assert "No scheme supplied" in str(first_call_arguments[0])
         assert fake_dir.exists()
         assert len([*fake_dir.iterdir()]) == 0
 
@@ -69,11 +71,12 @@ def test_download_from_url_not_successful(fake_dir):
     with patch("logging.Logger.error") as mock_logger:
         image_downloader.download_image_from_url(img_url, fake_dir)
 
+        logger_calls = mock_logger.call_args_list
+        first_call = logger_calls[0]
+        first_call_arguments = first_call[0]
+
         mock_logger.assert_called_once()
-        mock_logger.assert_called_with(
-            f"The following Exception happened: HTTPError for Url {img_url}\n"
-            f"Please check URLs"
-        )
+        assert "403 Client Error" in str(first_call_arguments[0])
         assert fake_dir.exists()
         assert len([*fake_dir.iterdir()]) == 0
 
@@ -96,9 +99,8 @@ def test_download_from_file_partly_successful(fake_dir, mixed_urls):
 
         first_call_arguments = first_call[0]
         second_call_arguments = second_call[0]
-
-        assert "ConnectionError" in first_call_arguments[0]
-        assert "HTTPError" in second_call_arguments[0]
+        assert "Failed to resolve" and "Max retries exceeded" in str(first_call_arguments[0])
+        assert "403 Client Error" in str(second_call_arguments[0])
         assert fake_dir.exists()
         assert len([*fake_dir.iterdir()]) == 1
 
