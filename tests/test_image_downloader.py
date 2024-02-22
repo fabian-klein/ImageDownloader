@@ -99,7 +99,9 @@ def test_download_from_file_partly_successful(fake_dir, mixed_urls):
 
         first_call_arguments = first_call[0]
         second_call_arguments = second_call[0]
-        assert "Failed to resolve" and "Max retries exceeded" in str(first_call_arguments[0])
+        assert "Failed to resolve" and "Max retries exceeded" in str(
+            first_call_arguments[0]
+        )
         assert "403 Client Error" in str(second_call_arguments[0])
         assert fake_dir.exists()
         assert len([*fake_dir.iterdir()]) == 1

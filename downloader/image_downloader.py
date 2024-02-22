@@ -8,9 +8,7 @@ from pathlib import Path
 LOGGER = logging.getLogger(__name__)
 
 
-def download_image_from_url(
-        img_url: str, save_path: str | Path, override: bool = True
-):
+def download_image_from_url(img_url: str, save_path: str | Path, override: bool = True):
     img = _download_image(img_url)
     if img:
         img_name = img_url.split("/")[-1]
@@ -23,7 +21,7 @@ def download_image_from_url(
 
 
 def download_image_from_file(
-        filename: str | os.PathLike, save_path: str | os.PathLike, override: bool = True
+    filename: str | os.PathLike, save_path: str | os.PathLike, override: bool = True
 ):
     if not os.path.isfile(filename):
         error_msg = f"{filename} does not exist"
@@ -58,8 +56,8 @@ def _get_urls_from_file(filename: str | os.PathLike) -> List[str]:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input-file", dest='file_name')
-    parser.add_argument("-o", "--output-folder", dest='output_folder')
+    parser.add_argument("-i", "--input-file", dest="file_name")
+    parser.add_argument("-o", "--output-folder", dest="output_folder")
     args = parser.parse_args()
 
     input_file = args.file_name
