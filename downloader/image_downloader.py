@@ -8,10 +8,6 @@ from pathlib import Path
 LOGGER = logging.getLogger(__name__)
 
 
-def get_path(filename: str) -> Path:
-    return Path(__file__).resolve().parent / filename
-
-
 def download_image_from_url(
         img_url: str, save_path: str | Path, override: bool = True
 ):
@@ -52,10 +48,6 @@ def _download_image(img_url: str) -> bytes | None:
         return response.content
     except requests.exceptions.RequestException as e:
         LOGGER.error(e)
-        # LOGGER.error(
-        #    f"The following Exception happened: {type(e).__name__} for Url {img_url}\n"
-        #    f"Please check URLs"
-        # )
 
 
 def _get_urls_from_file(filename: str | os.PathLike) -> List[str]:
