@@ -92,13 +92,10 @@ def test_download_from_file_not_existing_file(fake_dir, not_existing_file, caplo
     assert fake_dir.exists()
 
 
-def test_download_from_file_not_existing_save_path(get_not_existing_dir, existing_file, caplog):
+def test_download_from_file_not_existing_save_path(
+    get_not_existing_dir, existing_file, caplog
+):
     with pytest.raises(FileNotFoundError):
-        image_downloader.download_image_from_file(
-            existing_file, get_not_existing_dir
-        )
+        image_downloader.download_image_from_file(existing_file, get_not_existing_dir)
     assert len(caplog.records) == 1
     assert caplog.records[0].message == f"{get_not_existing_dir} does not exist"
-
-
-
