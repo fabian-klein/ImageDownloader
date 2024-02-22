@@ -10,14 +10,16 @@ LOGGER = logging.getLogger(__name__)
 
 def download_image_from_url(img_url: str, save_path: str | Path, override: bool = True):
     img = _download_image(img_url)
-    if img:
-        img_name = img_url.split("/")[-1]
-        save_path = str(save_path) + "/" + str(img_name)
-        if os.path.isfile(save_path) and not override:
-            LOGGER.warning(f"Image not saved! File {save_path}  already exists!")
-        else:
-            with open(save_path, mode="wb") as img_f:
-                img_f.write(img)
+    if not img:
+        return
+
+    img_name = img_url.split("/")[-1]
+    save_path = str(save_path) + "/" + str(img_name)
+    if os.path.isfile(save_path) and not override:
+        LOGGER.warning(f"Image not saved! File {save_path}  already exists!")
+    else:
+        with open(save_path, mode="wb") as img_f:
+            img_f.write(img)
 
 
 def download_image_from_file(
