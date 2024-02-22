@@ -41,88 +41,64 @@ def get_valid_url():
     return "https://interactives.natgeofe.com/high-touch/ngm-23-YIP/builds/main/img/photos/MM9747_221026_13114.jpg"
 
 
-def test_download_from_url_successful(fake_dir, working_url):
-    with patch("logging.Logger.error") as mock_logger:
-        image_downloader.download_image_from_url(working_url, fake_dir)
-        mock_logger.assert_not_called()
-        assert fake_dir.exists()
-        assert len([*fake_dir.iterdir()]) == 1
+def test_download_from_url_successful(fake_dir, working_url, caplog):
+    image_downloader.download_image_from_url(working_url, fake_dir)
+    assert len(caplog.records) == 0
+    assert fake_dir.exists()
+    assert len([*fake_dir.iterdir()]) == 1
 
 
-def test_download_from_url_missing_schema(fake_dir):
-    img_url = "www.interactives.natgeofe.com/high-touch/ngm-23-YIP/builds/main/img/photos/MM9747_221026_13114.jpg"
-    with patch("logging.Logger.error") as mock_logger:
-        image_downloader.download_image_from_url(
-            img_url,
-            fake_dir,
-        )
-        mock_logger.assert_called_once()
-        logger_calls = mock_logger.call_args_list
-        first_call = logger_calls[0]
-        first_call_arguments = first_call[0]
-
-        assert "No scheme supplied" in str(first_call_arguments[0])
-        assert fake_dir.exists()
-        assert len([*fake_dir.iterdir()]) == 0
-
-
-def test_download_from_url_not_successful(fake_dir):
+def test_download_from_url_not_successful(fake_dir, caplog):
     img_url = "https://interactives.natgeofe.com/thisdoesnotexist.jpg"
-    with patch("logging.Logger.error") as mock_logger:
-        image_downloader.download_image_from_url(img_url, fake_dir)
+    image_downloader.download_image_from_url(img_url, fake_dir)
 
-        logger_calls = mock_logger.call_args_list
-        first_call = logger_calls[0]
-        first_call_arguments = first_call[0]
-
-        mock_logger.assert_called_once()
-        assert "403 Client Error" in str(first_call_arguments[0])
-        assert fake_dir.exists()
-        assert len([*fake_dir.iterdir()]) == 0
+    assert "403 Client Error" in caplog.records[0].message
+    assert fake_dir.exists()
+    assert len([*fake_dir.iterdir()]) == 0
 
 
-def test_download_from_file_successful(fake_dir, existing_file):
+def test_download_from_url_missing_schema(fake_dir, caplog):
+    img_url = "www.interactives.natgeofe.com/high-touch/ngm-23-YIP/builds/main/img/photos/MM9747_221026_13114.jpg"
+    image_downloader.download_image_from_url(
+        img_url,
+        fake_dir,
+    )
+
+    assert "No scheme supplied" in caplog.records[0].message
+    assert fake_dir.exists()
+    assert len([*fake_dir.iterdir()]) == 0
+
+
+def test_download_from_file_successful(fake_dir, existing_file, caplog):
     image_downloader.download_image_from_file(existing_file, fake_dir)
+
+    assert len(caplog.records) == 0
     assert fake_dir.exists()
     assert len([*fake_dir.iterdir()]) == 5
 
 
-def test_download_from_file_partly_successful(fake_dir, mixed_urls):
-    with patch("logging.Logger.error") as mock_logger:
-        image_downloader.download_image_from_file(mixed_urls, fake_dir)
-
-        mock_logger.assert_called()
-        logger_calls = mock_logger.call_args_list
-
-        first_call = logger_calls[0]
-        second_call = logger_calls[1]
-
-        first_call_arguments = first_call[0]
-        second_call_arguments = second_call[0]
-        assert "Failed to resolve" and "Max retries exceeded" in str(
-            first_call_arguments[0]
-        )
-        assert "403 Client Error" in str(second_call_arguments[0])
-        assert fake_dir.exists()
-        assert len([*fake_dir.iterdir()]) == 1
+def test_download_from_file_partly_successful(fake_dir, mixed_urls, caplog):
+    image_downloader.download_image_from_file(mixed_urls, fake_dir)
+    assert "Failed to resolve" and "Max retries exceeded" in caplog.records[0].message
+    assert "403 Client Error" in caplog.records[1].message
+    assert fake_dir.exists()
+    assert len([*fake_dir.iterdir()]) == 1
 
 
-def test_download_from_file_not_existing_file(fake_dir, not_existing_file):
-    with patch("logging.Logger.error") as mock_logger:
-        with pytest.raises(FileNotFoundError):
-            image_downloader.download_image_from_file(not_existing_file, fake_dir)
-
-    mock_logger.assert_called_once()
-    mock_logger.assert_called_with(f"{not_existing_file} does not exist")
+def test_download_from_file_not_existing_file(fake_dir, not_existing_file, caplog):
+    with pytest.raises(FileNotFoundError):
+        image_downloader.download_image_from_file(not_existing_file, fake_dir)
+    assert len(caplog.records) == 1
     assert fake_dir.exists()
 
 
-def test_download_from_file_not_existing_save_path(get_not_existing_dir, existing_file):
-    with patch("logging.Logger.error") as mock_logger:
-        with pytest.raises(FileNotFoundError):
-            image_downloader.download_image_from_file(
-                existing_file, get_not_existing_dir
-            )
+def test_download_from_file_not_existing_save_path1(get_not_existing_dir, existing_file, caplog):
+    with pytest.raises(FileNotFoundError):
+        image_downloader.download_image_from_file(
+            existing_file, get_not_existing_dir
+        )
+    assert len(caplog.records) == 1
+    assert caplog.records[0].message == f"{get_not_existing_dir} does not exist"
 
-    mock_logger.assert_called_once()
-    mock_logger.assert_called_with(f"{get_not_existing_dir} does not exist")
+
+
